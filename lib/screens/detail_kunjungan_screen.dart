@@ -487,20 +487,49 @@ class _DetailKunjunganScreenState extends State<DetailKunjunganScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Batalkan Antrian'),
-        content: const Text('Apakah Anda yakin ingin membatalkan antrian ini?'),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: AppTheme.errorColor),
+            SizedBox(width: 10),
+            Text('Batalkan Antrian'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Apakah Anda yakin ingin membatalkan antrian ini?'),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nomor Antrian: ${widget.antrian.noAntrian}',
+                    style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Dokter: ${widget.antrian.namaDokter}',
+                    style: AppTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Tidak'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fitur batalkan antrian akan segera tersedia')),
-              );
-            },
+            onPressed: () => _cancelAntrian(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.errorColor,
             ),
@@ -509,6 +538,99 @@ class _DetailKunjunganScreenState extends State<DetailKunjunganScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _cancelAntrian(BuildContext dialogContext) async {
+    // Close dialog
+    Navigator.pop(dialogContext);
+
+    if (!mounted) return;
+
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Membatalkan antrian...'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final success = await _apiService.deleteAntrian(widget.antrian.id);
+
+      if (!mounted) return;
+
+      // Close loading
+      Navigator.pop(context);
+
+      if (success) {
+        // Show success dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.check_circle, color: AppTheme.successColor),
+                SizedBox(width: 10),
+                Text('Berhasil'),
+              ],
+            ),
+            content: const Text('Antrian berhasil dibatalkan'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context); // Back to riwayat
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      // Close loading
+      Navigator.pop(context);
+
+      // Show error dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.error_outline, color: AppTheme.errorColor),
+              SizedBox(width: 10),
+              Text('Gagal'),
+            ],
+          ),
+          content: Text(
+            e.toString().replaceAll('Exception: ', ''),
+            style: AppTheme.bodyMedium,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
 

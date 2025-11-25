@@ -300,5 +300,25 @@ class ApiService {
       rethrow;
     }
   }
+
+  // Delete/Cancel antrian
+  Future<bool> deleteAntrian(int id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${ApiConfig.baseUrl}/antrian/$id'),
+        headers: ApiConfig.headers,
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Gagal membatalkan antrian');
+      }
+    } catch (e) {
+      debugPrint('Error delete antrian: $e');
+      rethrow;
+    }
+  }
 }
 
