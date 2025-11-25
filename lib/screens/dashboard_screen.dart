@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../config/app_theme.dart';
 import '../providers/auth_provider.dart';
 import 'login_screen.dart';
+import 'ambil_antrian_screen.dart';
+import 'jadwal_dokter_screen.dart';
+import 'riwayat_kunjungan_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -144,8 +147,12 @@ class DashboardScreen extends StatelessWidget {
                       subtitle: 'Daftar kunjungan baru',
                       color: AppTheme.primaryColor,
                       onTap: () {
-                        // TODO: Navigate ke Ambil Antrian
-                        _showComingSoonDialog(context, 'Ambil Antrian');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AmbilAntrianScreen(),
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 16),
@@ -157,8 +164,12 @@ class DashboardScreen extends StatelessWidget {
                       subtitle: 'Lihat jadwal praktek dokter',
                       color: AppTheme.successColor,
                       onTap: () {
-                        // TODO: Navigate ke Jadwal Dokter
-                        _showComingSoonDialog(context, 'Jadwal Dokter');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const JadwalDokterScreen(),
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 16),
@@ -170,8 +181,12 @@ class DashboardScreen extends StatelessWidget {
                       subtitle: 'Lihat riwayat kunjungan Anda',
                       color: AppTheme.warningColor,
                       onTap: () {
-                        // TODO: Navigate ke Riwayat Kunjungan
-                        _showComingSoonDialog(context, 'Riwayat Kunjungan');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const RiwayatKunjunganScreen(),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -286,37 +301,6 @@ class DashboardScreen extends StatelessWidget {
               backgroundColor: AppTheme.errorColor,
             ),
             child: Text('Logout', style: AppTheme.buttonText),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showComingSoonDialog(BuildContext context, String feature) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.info_outline, color: AppTheme.primaryColor),
-            const SizedBox(width: 10),
-            Text('Info', style: AppTheme.headingSmall),
-          ],
-        ),
-        content: Text(
-          'Fitur "$feature" akan segera dijelaskan.',
-          style: AppTheme.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'OK',
-              style: AppTheme.bodyLarge.copyWith(
-                color: AppTheme.primaryColor,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
           ),
         ],
       ),

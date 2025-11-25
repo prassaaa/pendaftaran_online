@@ -4,6 +4,11 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/pasien.dart';
 import '../models/kunjungan.dart';
+import '../models/jadwal_dokter.dart';
+import '../models/antrian.dart';
+import '../models/master_poli.dart';
+import '../models/master_penjamin.dart';
+import '../models/transaksi.dart';
 
 class ApiService {
   // Singleton pattern
@@ -131,6 +136,167 @@ class ApiService {
       }
     } catch (e) {
       debugPrint('Error get all kunjungan: $e');
+      rethrow;
+    }
+  }
+
+  // Get jadwal dokter
+  Future<List<JadwalDokter>> getJadwalDokter({String? poli, String? hari}) async {
+    try {
+      String url = '${ApiConfig.baseUrl}/jadwal-dokter?';
+      if (poli != null) url += 'poli=$poli&';
+      if (hari != null) url += 'hari=$hari';
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: ApiConfig.headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['data'] != null) {
+          List<JadwalDokter> jadwalList = [];
+          for (var item in data['data']) {
+            jadwalList.add(JadwalDokter.fromJson(item));
+          }
+          return jadwalList;
+        }
+        return [];
+      } else {
+        throw Exception('Gagal mengambil jadwal dokter');
+      }
+    } catch (e) {
+      debugPrint('Error get jadwal dokter: $e');
+      rethrow;
+    }
+  }
+
+  // Get master poli
+  Future<List<MasterPoli>> getMasterPoli() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/master-poli'),
+        headers: ApiConfig.headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['data'] != null) {
+          List<MasterPoli> poliList = [];
+          for (var item in data['data']) {
+            poliList.add(MasterPoli.fromJson(item));
+          }
+          return poliList;
+        }
+        return [];
+      } else {
+        throw Exception('Gagal mengambil data poli');
+      }
+    } catch (e) {
+      debugPrint('Error get master poli: $e');
+      rethrow;
+    }
+  }
+
+  // Get master penjamin
+  Future<List<MasterPenjamin>> getMasterPenjamin() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/master-penjamin'),
+        headers: ApiConfig.headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['data'] != null) {
+          List<MasterPenjamin> penjaminList = [];
+          for (var item in data['data']) {
+            penjaminList.add(MasterPenjamin.fromJson(item));
+          }
+          return penjaminList;
+        }
+        return [];
+      } else {
+        throw Exception('Gagal mengambil data penjamin');
+      }
+    } catch (e) {
+      debugPrint('Error get master penjamin: $e');
+      rethrow;
+    }
+  }
+
+  // Create antrian
+  Future<Antrian?> createAntrian(Map<String, dynamic> data) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/antrian'),
+        headers: ApiConfig.headers,
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return Antrian.fromJson(responseData['data']);
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Gagal membuat antrian');
+      }
+    } catch (e) {
+      debugPrint('Error create antrian: $e');
+      rethrow;
+    }
+  }
+
+  // Get antrian by no_rm
+  Future<List<Antrian>> getAntrianByNoRM(String noRm) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/antrian?no_rm=$noRm'),
+        headers: ApiConfig.headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['data'] != null) {
+          List<Antrian> antrianList = [];
+          for (var item in data['data']) {
+            antrianList.add(Antrian.fromJson(item));
+          }
+          return antrianList;
+        }
+        return [];
+      } else {
+        throw Exception('Gagal mengambil data antrian');
+      }
+    } catch (e) {
+      debugPrint('Error get antrian: $e');
+      rethrow;
+    }
+  }
+
+  // Get transaksi by no_rm
+  Future<List<Transaksi>> getTransaksiByNoRM(String noRm) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/transaksi?no_rm=$noRm'),
+        headers: ApiConfig.headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['data'] != null) {
+          List<Transaksi> transaksiList = [];
+          for (var item in data['data']) {
+            transaksiList.add(Transaksi.fromJson(item));
+          }
+          return transaksiList;
+        }
+        return [];
+      } else {
+        throw Exception('Gagal mengambil data transaksi');
+      }
+    } catch (e) {
+      debugPrint('Error get transaksi: $e');
       rethrow;
     }
   }
