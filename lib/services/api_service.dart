@@ -15,19 +15,21 @@ class ApiService {
   Future<Pasien?> loginWithNoRM(String noRm) async {
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.pasienEndpoint}?no_rm=$noRm'),
+        Uri.parse('${ApiConfig.pasienEndpoint}/search/$noRm'),
         headers: ApiConfig.headers,
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
-        // Cek apakah ada data pasien
-        if (data['data'] != null && data['data'].isNotEmpty) {
-          // Ambil pasien pertama yang cocok
-          return Pasien.fromJson(data['data'][0]);
+
+        // Cek apakah berhasil dan ada data
+        if (data['success'] == true && data['data'] != null) {
+          return Pasien.fromJson(data['data']);
         }
-        return null; // Pasien tidak ditemukan
+        return null;
+      } else if (response.statusCode == 404) {
+        // Pasien tidak ditemukan
+        return null;
       } else {
         throw Exception('Gagal mengambil data pasien');
       }
