@@ -71,12 +71,19 @@ class ApiService {
         headers: ApiConfig.headers,
       );
 
+      debugPrint('=== API Response Debug ===');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Raw Response Body:');
+      debugPrint(response.body);
+      debugPrint('========================');
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
+
         if (data['data'] != null) {
           List<Kunjungan> kunjunganList = [];
           for (var item in data['data']) {
+            debugPrint('Processing item: $item');
             kunjunganList.add(Kunjungan.fromJson(item));
           }
           return kunjunganList;

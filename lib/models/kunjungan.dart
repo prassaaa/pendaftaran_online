@@ -36,22 +36,24 @@ class Kunjungan {
   factory Kunjungan.fromJson(Map<String, dynamic> json) {
     return Kunjungan(
       id: json['id'] ?? 0,
-      noRegistrasi: json['no_registrasi'] ?? '',
+      // Support both 'no_registrasi' and 'no_registrasi_kunjungan' from API
+      noRegistrasi: json['no_registrasi_kunjungan'] ?? json['no_registrasi'] ?? '',
       noRm: json['no_rm'] ?? '',
       tanggalKunjungan: json['tanggal_kunjungan'] ?? '',
       kodeDokter: json['kode_dokter'] ?? '',
       poli: json['poli'] ?? '',
       instalasi: json['instalasi'] ?? '',
       penjaminId: json['penjamin_id'] ?? 0,
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
           : null,
-      updatedAt: json['updated_at'] != null 
-          ? DateTime.parse(json['updated_at']) 
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
           : null,
       pasien: json['pasien'],
       dokter: json['dokter'],
-      masterPoli: json['master_poli'],
+      // Support both 'master_poli' and 'poli_relation' from API
+      masterPoli: json['master_poli'] ?? json['poli_relation'],
       penjamin: json['penjamin'],
     );
   }

@@ -4,29 +4,29 @@ import 'package:intl/intl.dart';
 import '../config/app_theme.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
-import '../models/kunjungan.dart';
-import 'detail_kunjungan_screen.dart';
+import '../models/antrian.dart';
+import 'detail_antrian_screen.dart';
 
-class RiwayatKunjunganScreen extends StatefulWidget {
-  const RiwayatKunjunganScreen({super.key});
+class RiwayatAntrianScreen extends StatefulWidget {
+  const RiwayatAntrianScreen({super.key});
 
   @override
-  State<RiwayatKunjunganScreen> createState() => _RiwayatKunjunganScreenState();
+  State<RiwayatAntrianScreen> createState() => _RiwayatAntrianScreenState();
 }
 
-class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
+class _RiwayatAntrianScreenState extends State<RiwayatAntrianScreen> {
   final ApiService _apiService = ApiService();
   
-  List<Kunjungan> _kunjunganList = [];
+  List<Antrian> _antrianList = [];
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _loadRiwayatKunjungan();
+    _loadRiwayatAntrian();
   }
 
-  Future<void> _loadRiwayatKunjungan() async {
+  Future<void> _loadRiwayatAntrian() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final pasien = authProvider.currentPasien;
 
@@ -44,63 +44,19 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
     });
 
     try {
-      final kunjungan = await _apiService.getKunjunganByNoRM(pasien.noRm);
-
-      // Debug: Print data untuk melihat apa yang diterima
-      debugPrint('=== DEBUG RIWAYAT KUNJUNGAN ===');
-      debugPrint('Total kunjungan: ${kunjungan.length}');
-      for (var k in kunjungan) {
-        debugPrint('---');
-        debugPrint('Kunjungan ID: ${k.id}');
-        debugPrint('No Registrasi: "${k.noRegistrasi}" (length: ${k.noRegistrasi.length})');
-        debugPrint('No RM: "${k.noRm}"');
-        debugPrint('Nama Dokter: "${k.namaDokter}"');
-        debugPrint('Dokter data: ${k.dokter}');
-        debugPrint('Poli: "${k.poli}"');
-        debugPrint('Instalasi: "${k.instalasi}"');
-        debugPrint('Master Poli: ${k.masterPoli}');
-      }
-      debugPrint('==============================');
-
+      final antrian = await _apiService.getAntrianByNoRM(pasien.noRm);
+      
       setState(() {
-        _kunjunganList = kunjungan;
+        _antrianList = antrian;
         _isLoading = false;
       });
-    } catch (e, stackTrace) {
-      debugPrint('=== ERROR LOADING RIWAYAT ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
-      debugPrint('============================');
-
+    } catch (e) {
       setState(() {
         _isLoading = false;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal memuat riwayat: $e'),
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'Detail',
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Error Detail'),
-                    content: SingleChildScrollView(
-                      child: Text('$e\n\n$stackTrace'),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
+          SnackBar(content: Text('Gagal memuat riwayat: $e')),
         );
       }
     }
@@ -110,11 +66,11 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Riwayat Kunjungan'),
+        title: const Text('Riwayat Antrian'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadRiwayatKunjungan,
+            onPressed: _loadRiwayatAntrian,
           ),
         ],
       ),
@@ -127,20 +83,20 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_kunjunganList.isEmpty) {
+    if (_antrianList.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.medical_services_outlined, size: 80, color: Colors.grey.shade400),
+            Icon(Icons.history, size: 80, color: Colors.grey.shade400),
             const SizedBox(height: 16),
             Text(
-              'Belum ada riwayat kunjungan',
+              'Belum ada riwayat antrian',
               style: AppTheme.headingSmall.copyWith(color: Colors.grey),
             ),
             const SizedBox(height: 8),
             Text(
-              'Riwayat kunjungan Anda akan muncul di sini',
+              'Riwayat antrian Anda akan muncul di sini',
               style: AppTheme.bodyMedium.copyWith(color: Colors.grey),
             ),
           ],
@@ -149,22 +105,47 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: _loadRiwayatKunjungan,
+      onRefresh: _loadRiwayatAntrian,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: _kunjunganList.length,
+        itemCount: _antrianList.length,
         itemBuilder: (context, index) {
-          final kunjungan = _kunjunganList[index];
-          return _buildKunjunganCard(kunjungan);
+          final antrian = _antrianList[index];
+          return _buildKunjunganCard(antrian);
         },
       ),
     );
   }
 
-  Widget _buildKunjunganCard(Kunjungan kunjungan) {
-    final tanggal = DateTime.parse(kunjungan.tanggalKunjungan);
+  Widget _buildKunjunganCard(Antrian antrian) {
+    final tanggal = DateTime.parse(antrian.tanggalKunjungan);
     final isToday = DateFormat('yyyy-MM-dd').format(tanggal) == 
                     DateFormat('yyyy-MM-dd').format(DateTime.now());
+    
+    Color statusColor;
+    IconData statusIcon;
+    
+    switch (antrian.status) {
+      case 'menunggu':
+        statusColor = AppTheme.warningColor;
+        statusIcon = Icons.schedule;
+        break;
+      case 'dipanggil':
+        statusColor = AppTheme.primaryColor;
+        statusIcon = Icons.notifications_active;
+        break;
+      case 'selesai':
+        statusColor = AppTheme.successColor;
+        statusIcon = Icons.check_circle;
+        break;
+      case 'batal':
+        statusColor = AppTheme.errorColor;
+        statusIcon = Icons.cancel;
+        break;
+      default:
+        statusColor = Colors.grey;
+        statusIcon = Icons.help;
+    }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -173,7 +154,7 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => DetailKunjunganScreen(kunjungan: kunjungan),
+              builder: (_) => DetailAntrianScreen(antrian: antrian),
             ),
           );
         },
@@ -183,24 +164,24 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // Header with status
               Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppTheme.successColor.withValues(alpha: 0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.check_circle, size: 16, color: AppTheme.successColor),
+                        Icon(statusIcon, size: 16, color: statusColor),
                         const SizedBox(width: 6),
                         Text(
-                          'SELESAI',
+                          antrian.status.toUpperCase(),
                           style: AppTheme.bodySmall.copyWith(
-                            color: AppTheme.successColor,
+                            color: statusColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -226,8 +207,8 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // No Registrasi
+              
+              // Nomor Antrian
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -239,52 +220,38 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.receipt_long, color: AppTheme.primaryColor),
+                    const Icon(Icons.confirmation_number, color: AppTheme.primaryColor),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('No. Registrasi', style: AppTheme.bodySmall),
-                          Text(
-                            kunjungan.noRegistrasi.isNotEmpty
-                                ? kunjungan.noRegistrasi
-                                : '-',
-                            style: AppTheme.bodyLarge.copyWith(
-                              color: kunjungan.noRegistrasi.isNotEmpty
-                                  ? AppTheme.primaryColor
-                                  : Colors.grey.shade400,
-                              fontWeight: FontWeight.w600,
-                            ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Nomor Antrian', style: AppTheme.bodySmall),
+                        Text(
+                          antrian.noAntrian,
+                          style: AppTheme.headingSmall.copyWith(
+                            color: AppTheme.primaryColor,
+                            fontSize: 20,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
-
+              
               // Info kunjungan
-              _buildInfoRow(
-                Icons.local_hospital,
-                'Poli',
-                kunjungan.masterPoli?['nama_poli'] ?? kunjungan.poli
-              ),
+              _buildInfoRow(Icons.local_hospital, 'Poli', antrian.namaPoli),
               const SizedBox(height: 12),
-              _buildInfoRow(
-                Icons.business,
-                'Instalasi',
-                kunjungan.instalasi
-              ),
-              const SizedBox(height: 12),
-              _buildInfoRow(Icons.person, 'Dokter', kunjungan.namaDokter),
+              _buildInfoRow(Icons.person, 'Dokter', antrian.namaDokter),
               const SizedBox(height: 12),
               _buildInfoRow(
                 Icons.calendar_today,
                 'Tanggal',
                 DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(tanggal),
               ),
+              const SizedBox(height: 12),
+              _buildInfoRow(Icons.access_time, 'Jam Praktek', antrian.jamPraktek),
             ],
           ),
         ),
@@ -292,9 +259,7 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String? value) {
-    final displayValue = value?.trim().isEmpty ?? true ? '-' : value!;
-
+  Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       children: [
         Icon(icon, size: 20, color: Colors.grey.shade600),
@@ -306,11 +271,8 @@ class _RiwayatKunjunganScreenState extends State<RiwayatKunjunganScreen> {
               Text(label, style: AppTheme.bodySmall.copyWith(color: Colors.grey)),
               const SizedBox(height: 2),
               Text(
-                displayValue,
-                style: AppTheme.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: displayValue == '-' ? Colors.grey.shade400 : null,
-                ),
+                value,
+                style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),

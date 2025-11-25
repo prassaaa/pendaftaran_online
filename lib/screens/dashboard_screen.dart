@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 import 'ambil_antrian_screen.dart';
 import 'jadwal_dokter_screen.dart';
+import 'riwayat_antrian_screen.dart';
 import 'riwayat_kunjungan_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -176,10 +177,27 @@ class DashboardScreen extends StatelessWidget {
                     
                     _buildMenuCard(
                       context,
-                      icon: Icons.history_rounded,
-                      title: 'Riwayat Kunjungan',
-                      subtitle: 'Lihat riwayat kunjungan Anda',
+                      icon: Icons.list_alt_rounded,
+                      title: 'Riwayat Antrian',
+                      subtitle: 'Lihat antrian yang sudah dibuat',
                       color: AppTheme.warningColor,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const RiwayatAntrianScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildMenuCard(
+                      context,
+                      icon: Icons.medical_services_rounded,
+                      title: 'Riwayat Kunjungan',
+                      subtitle: 'Lihat riwayat kunjungan & billing',
+                      color: Colors.purple,
                       onTap: () {
                         Navigator.push(
                           context,
