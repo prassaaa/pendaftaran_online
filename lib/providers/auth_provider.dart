@@ -76,7 +76,7 @@ class AuthProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error loading pasien from local: $e');
+      debugPrint('Error loading pasien from local: $e');
     }
   }
 

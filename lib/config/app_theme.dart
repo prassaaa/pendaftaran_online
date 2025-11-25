@@ -78,7 +78,6 @@ class AppTheme {
         seedColor: primaryColor,
         primary: primaryColor,
         secondary: secondaryColor,
-        background: backgroundColor,
         surface: cardColor,
         error: errorColor,
       ),

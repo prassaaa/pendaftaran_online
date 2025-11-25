@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/pasien.dart';
@@ -31,7 +32,7 @@ class ApiService {
         throw Exception('Gagal mengambil data pasien');
       }
     } catch (e) {
-      print('Error login: $e');
+      debugPrint('Error login: $e');
       rethrow;
     }
   }
@@ -50,7 +51,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('Error get pasien: $e');
+      debugPrint('Error get pasien: $e');
       rethrow;
     }
   }
@@ -78,7 +79,7 @@ class ApiService {
         throw Exception('Gagal mengambil data kunjungan');
       }
     } catch (e) {
-      print('Error get kunjungan: $e');
+      debugPrint('Error get kunjungan: $e');
       rethrow;
     }
   }
@@ -99,7 +100,7 @@ class ApiService {
         throw Exception('Gagal membuat kunjungan');
       }
     } catch (e) {
-      print('Error create kunjungan: $e');
+      debugPrint('Error create kunjungan: $e');
       rethrow;
     }
   }
@@ -127,7 +128,7 @@ class ApiService {
         throw Exception('Gagal mengambil data kunjungan');
       }
     } catch (e) {
-      print('Error get all kunjungan: $e');
+      debugPrint('Error get all kunjungan: $e');
       rethrow;
     }
   }

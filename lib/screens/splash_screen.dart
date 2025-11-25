@@ -103,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -130,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       Text(
                         'KEDIRI',
                         style: AppTheme.headingMedium.copyWith(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 20,
                           letterSpacing: 4,
                         ),
@@ -141,7 +141,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       Text(
                         'Pendaftaran Online',
                         style: AppTheme.bodyLarge.copyWith(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 16,
                         ),
                       ),
